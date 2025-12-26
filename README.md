@@ -8,4 +8,3 @@ and then:
 `cmake --build build`
 and finally:
 `./build/chip8`
-.
