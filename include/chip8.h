@@ -38,4 +38,7 @@ public:
 
 };
 
+void initialiseGraphics();
+void initialiseInput();
+
 #endif
