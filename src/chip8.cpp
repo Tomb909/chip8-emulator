@@ -46,7 +46,18 @@ void chip8::initialise() {
 void chip8::loadGame(std::string gameName) {
     std::ifstream file( (gameName + ".ch8").c_str(), std::ios::binary);
 
-    if (!file) std::cerr << "Game ROM file could not be opened\n";
+    if (!file) throw std::runtime_error("Game ROM file could not be opened\n");
 
-    
+    // get length of file
+    file.seekg(0, std::ios::end);
+    size_t size = file.tellg();
+
+    // memory size is 4096, ROM stored at 512 onwards, 4096 - 512 = 3854
+    if (size > 3854) {
+        throw std::runtime_error("Game ROM is too large to be stored in memory");
+    }
+
+    // move seek get pointer back to start
+    file.seekg(0, std::ios::beg);
+    file.read(reinterpret_cast<char*>(&memory[512]), size);
 }
