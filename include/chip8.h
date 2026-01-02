@@ -2,6 +2,7 @@
 #define CHIP8_H
 
 #include <string>
+#include <random>
 
 class chip8
 {
@@ -20,13 +21,20 @@ private:
     uint8_t gfc[64 * 32]; // graphics for chip 8 system, 64x32 screen (2048 pixels)
 
     // timer registers count at 60Hz, when above 0 they count down to 0
-    uint8_t delay_timer;
-    uint8_t sound_timer;
+    uint8_t delayTimer;
+    uint8_t soundTimer;
 
     uint16_t stack[16];
     uint16_t sp; // stack pointer
 
-    uint8_t key[16]; // hex based key pad, stores current state of key
+    uint8_t key[16]; // hex based key pad, stores current state of key, 0 is not pressed
+
+    inline std::mt19937& rng() {
+        static std::mt19937 gen{std::random_device{}()};
+        return gen;
+    }
+
+    bool updateScreen = false;
 
 public:
     void initialise();
