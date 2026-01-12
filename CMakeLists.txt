@@ -7,10 +7,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_EXTENSIONS off)
 
-add_executable(chip8
-    src/main.cpp
-    src/chip8.cpp
-)
+# find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3-shared)
+add_subdirectory(vendor)
+add_subdirectory(src)
 
-target_include_directories(chip8 PRIVATE include)
-
+target_include_directories(${PROJECT_NAME} PRIVATE include)
