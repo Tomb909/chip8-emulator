@@ -2,6 +2,7 @@
 #include <fstream>
 #include <iostream>
 #include <random>
+#include <SDL3/SDL.h>
 
 unsigned char chip8_fontset[80] =
 { 
@@ -34,6 +35,7 @@ void chip8::initialise() {
     std::fill_n(gfc, 2048, 0); // clear display
     std::fill_n(v, 16, 0); // clear registers
     std::fill_n(memory, 4096, 0); // clear memory
+    std::fill_n(key, 16, 0);
 
     // load fontset into first 80 bytes of memory
     for (int i = 0; i < 80; i++) {
@@ -45,7 +47,7 @@ void chip8::initialise() {
 }
 
 void chip8::loadGame(std::string gameName) {
-    std::ifstream file( (gameName + ".ch8").c_str(), std::ios::binary);
+    std::ifstream file( ("roms/" + gameName + ".ch8").c_str(), std::ios::binary);
 
     if (!file) throw std::runtime_error("Game ROM file could not be opened\n");
 
@@ -84,7 +86,7 @@ void chip8::emulateCycle() {
                 pc += 2;
             break;
             case 0x000E:
-                pc = stack[--sp];
+                pc = stack[sp--];
                 pc += 2;
             break;
             default:
@@ -181,6 +183,7 @@ void chip8::emulateCycle() {
                         v[0xF] = 1;
                     }
                     v[x] = v[y] - v[x];
+                    pc += 2;
                 break;
                 case 0x000E:
                     v[0xF] = v[y] & 128;
@@ -190,6 +193,7 @@ void chip8::emulateCycle() {
             default:
                 std::cout << "Unknown opcode: " << opcode << '\n';
             }
+        break;
         case 0x9000:
             if (v[x] != v[y]) {
                 pc += 4;
@@ -209,23 +213,24 @@ void chip8::emulateCycle() {
             pc += 2;
         break;
         case 0xD000:
+        {
             uint8_t pixelLine;
 
             // reset F register to used as collision register
             v[0xF] = 0;
 
             // each yline is a byte, opcode asks to read n bytes from memory
-            for (int yLine = 0; yLine < n; y++) {
+            for (int yLine = 0; yLine < n; yLine++) {
                 pixelLine = memory[I + yLine];
 
                 for (int xLine = 0; xLine < 8; xLine++) {
                     // check if single bit in line of pixels is not 0 to remove redundant work
                     if((pixelLine & (0x80 >> xLine)) != 0) {
                         // * 64 because for each y level we go we skip 64 entries     
-                        if (gfc[x + xLine + ((y + yLine) * 64)] == 1) {
+                        if (gfc[v[x] + xLine + ((v[y] + yLine) * 64)] == 1) {
                             v[0xF] = 1;
                         }
-                        gfc[x + xLine + ((y + yLine) * 64)] ^= 1;
+                        gfc[v[x] + xLine + ((v[y] + yLine) * 64)] ^= 1;
                     }
 
                 }
@@ -234,7 +239,8 @@ void chip8::emulateCycle() {
             updateScreen = true;
             pc += 2;
             
-        break;
+            break;
+        }
         case 0xE000:
             switch (opcode & 0x00FF)
             {
@@ -315,7 +321,7 @@ void chip8::emulateCycle() {
                 for (int j = 0; j <= x; j++) {
                     v[j] = memory[I + j];
                 }
-                I += x = 1;
+                I += x + 1;
                 pc += 2;
             break;
             default:
@@ -324,6 +330,56 @@ void chip8::emulateCycle() {
         break;
         default:
             std::cout << "Unknown opcode: " << opcode << '\n';
+            pc += 2;
 
     }
+
+    if (delayTimer > 0) {
+        delayTimer--;
+    }
+
+    if (soundTimer > 0) {
+        soundTimer--;
+    }
+}
+
+void chip8::setKey(uint8_t keyChanged) {
+    key[keyChanged] = !key[keyChanged];
+}
+
+void chip8::initialiseGraphics() {
+    SDL_Init(SDL_INIT_VIDEO);
+
+    SDL_Window *window = SDL_CreateWindow(
+        "CHIP-8",
+        640,
+        320,
+        0
+    );
+
+    renderer = SDL_CreateRenderer(window, NULL);
+}
+
+void chip8::drawGraphics() {
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+
+    SDL_FRect rect;
+    rect.w = 10;
+    rect.h = 10;
+
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+    for (int x = 0; x < 64; x++) {
+        for (int y = 0; y < 32; y++) {
+            if (gfc[x + 64 * y] == 1) {
+                rect.x = x * 10;
+                rect.y = y * 10;
+                SDL_RenderFillRect(renderer, &rect);
+            }
+        }
+    }
+
+    SDL_RenderPresent(renderer);
+
 }

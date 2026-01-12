@@ -3,6 +3,7 @@
 
 #include <string>
 #include <random>
+#include <SDL3/SDL.h>
 
 class chip8
 {
@@ -34,19 +35,20 @@ private:
         return gen;
     }
 
-    bool updateScreen = false;
-
 public:
     void initialise();
     void loadGame(std::string gameName);
     void emulateCycle();
-    bool drawFlag();
-    void setKeys();
+    void setKey(uint8_t keyChanged);
 
-
+    bool updateScreen = false;
+    int running = 0;
+    
+    void drawGraphics();
+    void initialiseGraphics();
+    SDL_Renderer *renderer;
 };
 
-void initialiseGraphics();
 void initialiseInput();
 
 #endif
