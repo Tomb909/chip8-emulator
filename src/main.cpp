@@ -31,11 +31,13 @@ int main(int argc, char **argv) {
         clockSpeed = std::stoi(argv[2]);
     }
 
-    
     std::map<SDL_Keycode, uint8_t> keyMap = {{SDLK_1, 0}, {SDLK_2, 1}, {SDLK_3, 2}, {SDLK_4, 3},
                                                  {SDLK_Q, 4}, {SDLK_W, 5}, {SDLK_E, 6}, {SDLK_R, 7},
                                                  {SDLK_A, 8}, {SDLK_S, 9}, {SDLK_D, 0xA}, {SDLK_F, 0xB},
                                                  {SDLK_Z, 0xC}, {SDLK_X, 0xD}, {SDLK_C, 0xE}, {SDLK_V, 0xF}};
+
+    auto lastTimerUpdate = SDL_GetTicks();
+
     while (running) {
 
         auto cycleStart = SDL_GetTicks();
@@ -53,14 +55,14 @@ int main(int argc, char **argv) {
             }
         }
 
-        Chip8.emulateCycle();
-
-        if (Chip8.updateScreen == true) {
-            Chip8.drawGraphics();
+        if (SDL_GetTicks() - lastTimerUpdate > 16) {
+            Chip8.tickTimers();
         }
 
+        Chip8.emulateCycle();
+
         auto cycleEnd = SDL_GetTicks();
-        if (cycleStart - cycleEnd < clockSpeed / 1000) {
+        if ((cycleEnd - cycleStart) < (1000 / clockSpeed)) {
             SDL_Delay(1000 / clockSpeed - (cycleEnd - cycleStart));
         }
 

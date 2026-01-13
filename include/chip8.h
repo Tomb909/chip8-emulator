@@ -34,17 +34,18 @@ private:
         static std::mt19937 gen{std::random_device{}()};
         return gen;
     }
+    void drawGraphics();
 
 public:
     void initialise();
     void loadGame(std::string gameName);
     void emulateCycle();
     void setKey(uint8_t keyChanged);
+    void tickTimers();
 
     bool updateScreen = false;
     int running = 0;
     
-    void drawGraphics();
     void initialiseGraphics();
     SDL_Renderer *renderer;
 };

@@ -334,12 +334,8 @@ void chip8::emulateCycle() {
 
     }
 
-    if (delayTimer > 0) {
-        delayTimer--;
-    }
-
-    if (soundTimer > 0) {
-        soundTimer--;
+    if (updateScreen == true) {
+        drawGraphics();
     }
 }
 
@@ -382,4 +378,15 @@ void chip8::drawGraphics() {
 
     SDL_RenderPresent(renderer);
 
+}
+
+void chip8::tickTimers() {
+
+    if (delayTimer > 0) {
+        delayTimer--;
+    }
+
+    if (soundTimer > 0) {
+        soundTimer--;
+    }
 }
