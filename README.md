@@ -44,6 +44,9 @@ Run the emulator with:
 ./build/src/chip8 <rom_file> [clock_speed]
 ```
 
+![IBM Logo Test](/IBMtest.png)
+![Tetris Test](/TetrisTest.png)
+
 ## Things Left to Implement
 
 - Audio 
