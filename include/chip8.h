@@ -40,7 +40,7 @@ public:
     void initialise();
     void loadGame(std::string gameName);
     void emulateCycle();
-    void setKey(uint8_t keyChanged);
+    void setKey(uint8_t keyIndex, bool pressed);
     void tickTimers();
 
     bool updateScreen = false;

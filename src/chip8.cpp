@@ -47,7 +47,7 @@ void chip8::initialise() {
 }
 
 void chip8::loadGame(std::string gameName) {
-    std::ifstream file( ("roms/" + gameName + ".ch8").c_str(), std::ios::binary);
+    std::ifstream file( ("roms/" + gameName).c_str(), std::ios::binary);
 
     if (!file) throw std::runtime_error("Game ROM file could not be opened\n");
 
@@ -339,8 +339,8 @@ void chip8::emulateCycle() {
     }
 }
 
-void chip8::setKey(uint8_t keyChanged) {
-    key[keyChanged] = !key[keyChanged];
+void chip8::setKey(uint8_t keyIndex, bool pressed) {
+    if (keyIndex < 16 && keyIndex >= 0) key[keyIndex] = pressed ? 1 : 0;
 }
 
 void chip8::initialiseGraphics() {
