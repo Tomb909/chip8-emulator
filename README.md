@@ -51,7 +51,7 @@ Run the emulator with:
 
 - Audio 
 
-## Acknowledgements
+## Acknowledgements/Resources
 
 - [multigesture.net Chip8 Article](https://multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/)
 - [Cowgod's Technical Reference](http://devernay.free.fr/hacks/chip8/C8TECH10.HTM#font)
